@@ -25,7 +25,7 @@ h1{font-size:26px;margin:2px 0 0;letter-spacing:.5px;background:linear-gradient(
 .pill{background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px}
 #board{display:flex;flex-wrap:wrap;gap:16px 14px;justify-content:center;max-width:600px}
 .tube{position:relative;width:54px;height:200px;border:2px solid var(--line);border-radius:8px 8px 28px 28px;box-sizing:border-box;
-background:linear-gradient(90deg,#ffffff26,#ffffff06 45%,#ffffff1a);backdrop-filter:blur(2px);
+background:linear-gradient(90deg,#ffffff26,#ffffff06 45%,#ffffff1a);
 display:flex;flex-direction:column-reverse;align-items:center;padding:8px 0;gap:4px;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .2s}
 .tube:hover{transform:translateY(-2px)}
 .tube.sel{border-color:var(--accent);box-shadow:0 0 18px var(--accent)}
@@ -94,8 +94,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;background:ra
 body>*{position:relative;z-index:1}
 h1{font-size:clamp(32px,7vw,48px);letter-spacing:1px;background:linear-gradient(90deg,#ff2d75,#ffb300,#00c2ff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 8px #0005)}
 .bar{margin:12px 0 18px}
-.pill{background:#ffffff30;border:1px solid #ffffff55;font-weight:600;font-size:15px;backdrop-filter:blur(8px)}
-#board{width:min(96vw,860px);max-width:none;box-sizing:border-box;padding:26px 18px;gap:22px 16px;background:var(--panel);border:1px solid #ffffff44;border-radius:30px;box-shadow:0 24px 60px #0004,inset 0 1px 0 #ffffff55;backdrop-filter:blur(10px);min-height:46vh;align-content:center}
+.pill{background:#ffffff30;border:1px solid #ffffff55;font-weight:600;font-size:15px;}
+#board{width:min(96vw,860px);max-width:none;box-sizing:border-box;padding:26px 18px;gap:22px 16px;background:var(--panel);border:1px solid #ffffff44;border-radius:30px;box-shadow:0 24px 60px #0004,inset 0 1px 0 #ffffff55;min-height:46vh;align-content:center}
 .tube{width:calc(var(--b) + 16px);height:calc(var(--b)*4 + 36px);border:3px solid #ffffffaa;border-radius:14px 14px 40px 40px;background:linear-gradient(90deg,#ffffff44,#ffffff10 45%,#ffffff2e);box-shadow:inset 0 0 16px #ffffff2a,0 10px 20px #0003}
 .tube.sel{border-color:#ffe14d;box-shadow:0 0 24px #ffe14d,inset 0 0 16px #ffffff2a}
 .tube.done{border-color:#5bffb0;box-shadow:0 0 22px #5bffb0aa,inset 0 0 16px #ffffff2a}
@@ -123,15 +123,26 @@ h1{font-size:clamp(32px,7vw,48px);letter-spacing:1px;background:linear-gradient(
 html{-webkit-text-size-adjust:100%}
 body{overscroll-behavior:none}
 @supports(height:100dvh){body{min-height:100dvh}}
+#st{color:#ffe14d;letter-spacing:2px}
+.coin{display:inline-block;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff7b0,#ffb700);margin-right:5px;vertical-align:-1px}
+.bar{flex-wrap:wrap;justify-content:center}
+.bub,.fly{will-change:transform}
+#board{contain:layout style}
+#board.in .tube{animation:tin .5s both}
+@keyframes tin{from{opacity:0;transform:translateY(26px) scale(.92)}}
+body.th-sunset{--g1:#ffb347;--g2:#ff5e62;--g3:#7b2ff7}
+body.th-ocean{--g1:#00c6ff;--g2:#0072ff;--g3:#4c1d95}
+body.th-midnight{--g1:#05060f;--g2:#10163a;--g3:#2a1a5e}
+@media(prefers-reduced-motion:reduce){#bg{display:none}body::before{animation:none}#board.in .tube{animation:none}}
 </style>
 </head>
 <body>
 <h1>BALL SORT</h1>
-<div class="bar"><button id="menu" style="padding:6px 14px;border-radius:99px">☰ Menu</button><span class="pill">Level <b id="lvl">1</b></span><span class="pill">Moves <b id="mv">0</b></span></div>
+<div class="bar"><button id="menu" style="padding:6px 14px;border-radius:99px">☰ Menu</button><span class="pill">Level <b id="lvl">1</b></span><span class="pill" id="st">★★★</span><span class="pill">Moves <b id="mv">0</b></span><span class="pill"><i class="coin"></i><b id="co">0</b></span></div>
 <div id="board"></div>
 <div id="msg"></div>
 <div class="btns">
-<button id="undo">↶ Undo</button><button id="hint">💡 Hint</button><button id="ex">＋ Tube (2)</button><button id="restart">⟲ Restart</button>
+<button id="undo">↶ Undo</button><button id="hint">💡 Hint (10)</button><button id="ex">＋ Tube (2)</button><button id="restart">⟲ Restart</button>
 <button id="skip">🔀 New</button><button id="snd">🔊</button><button id="cb">◆ Shapes</button>
 </div>
 <div id="bg"></div>
@@ -146,14 +157,14 @@ body{overscroll-behavior:none}
 <div class="scr" id="howto"><div class="big" id="hi"></div><h2 id="ht"></h2><div class="sub" id="hd"></div><div class="sub" id="hn"></div>
 <div class="menu"><button class="main" id="hnext">Next</button><button id="hskip">Skip</button></div></div>
 <div class="scr" id="levels"><h2>Levels</h2><div class="lg" id="lg"></div><button data-go="home">← Back</button></div>
-<div class="scr" id="settings"><h2>Settings</h2><div class="menu"><button id="s_snd"></button><button id="s_cb"></button><button id="s_skin"></button><button id="reset">Reset progress</button><button data-go="home">← Back</button></div></div>
+<div class="scr" id="settings"><h2>Settings</h2><div class="menu"><button id="s_snd"></button><button id="s_cb"></button><button id="s_skin"></button><button id="s_theme"></button><button id="reset">Reset progress</button><button data-go="home">← Back</button></div></div>
 <div id="win"><div class="card"><h2 id="wt">Level cleared</h2><div class="stars" id="ws"></div><div id="wm"></div><br><button id="next">Next level →</button></div></div>
 <script>
 const COLORS=["#ff3b5c","#00d4aa","#ff9f1c","#2d7dff","#b04dff","#ffe033","#5ee03a","#ff4fc3"];
 const SYMS=["●","▲","■","★","◆","✚","♥","☾"];
 const CAP=4,$=id=>document.getElementById(id),board=$("board");
-let level=1,tubes=[],start=[],hist=[],sel=-1,moves=0,done=false,busy=false,muted=false,ncol=3,mys=false,tight=false,ex=2;
-try{level=parseInt(localStorage.getItem("bs_level"))||1;muted=localStorage.getItem("bs_mute")==="1"}catch(e){}
+let level=1,tubes=[],start=[],hist=[],sel=-1,moves=0,done=false,busy=false,muted=false,ncol=3,mys=false,tight=false,ex=2,coins=30;
+try{level=parseInt(localStorage.getItem("bs_level"))||1;muted=localStorage.getItem("bs_mute")==="1";{const c=localStorage.getItem("bs_coins");if(c!==null)coins=parseInt(c)||0}}catch(e){}
 
 /* sound */
 let AC;
@@ -171,7 +182,7 @@ function solve(t0){
   const seen=new Set();let n=0;
   function go(t,p){
     if(solved(t))return p;
-    if(++n>30000)return null;
+    if(++n>8000)return null;
     const k=t.map(x=>x.join("")).sort().join("|");
     if(seen.has(k))return null;seen.add(k);
     for(let a=0;a<t.length;a++)for(let b=0;b<t.length;b++){
@@ -186,7 +197,7 @@ function solve(t0){
 
 function generate(){
   ncol=Math.min(3+Math.floor((level-1)/2),8);mys=false;tight=level%5===0;
-  for(let i=0;i<(tight?12:50);i++){
+  for(let i=0;i<(tight?8:30);i++){
     const all=[];for(let c=0;c<ncol;c++)for(let j=0;j<CAP;j++)all.push(c);
     for(let j=all.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[all[j],all[k]]=[all[k],all[j]]}
     const t=[];for(let j=0;j<ncol;j++)t.push(all.slice(j*CAP,(j+1)*CAP));
@@ -196,10 +207,11 @@ function generate(){
   return [[0,1,0,1],[1,0,1,0],[],[]];
 }
 
+function saveCoins(){try{localStorage.setItem("bs_coins",coins)}catch(e){}}
 function load(fresh){
   if(fresh||!start.length)start=generate();
   tubes=start.map(x=>x.slice());hist=[];sel=-1;moves=0;done=false;busy=false;
-  ex=2;$("ex").textContent="＋ Tube (2)";$("win").classList.remove("on");$("msg").textContent=mys?"Mystery level: only the top ball of each tube is visible.":tight?"Tight level: only one empty tube.":"";render();
+  ex=2;$("ex").textContent="＋ Tube (2)";$("win").classList.remove("on");$("msg").textContent=mys?"Mystery level: only the top ball of each tube is visible.":tight?"Tight level: only one empty tube.":"";render();board.classList.add("in");setTimeout(()=>board.classList.remove("in"),700);
 }
 
 function render(){
@@ -209,7 +221,7 @@ function render(){
     t.forEach((c,k)=>{const b=document.createElement("div");b.className="ball";const hide=mys&&k<t.length-1&&!uni(t);b.style.backgroundColor=hide?"#6b7090":COLORS[c];b.innerHTML="<span>"+(hide?"?":SYMS[c])+"</span>";if(hide)b.classList.add("q");d.appendChild(b)});
     d.onclick=()=>tap(i);board.appendChild(d);
   });
-  $("lvl").textContent=level;$("mv").textContent=moves;
+  $("lvl").textContent=level;$("mv").textContent=moves;{const q=moves<=ncol*3?3:moves<=ncol*5?2:1;$("st").textContent="★".repeat(q)+"☆".repeat(3-q)}$("co").textContent=coins;
 }
 
 function fly(sb,to,color,cb){
@@ -244,10 +256,10 @@ function tap(i){
 function win(){
   done=true;
   const stars=moves<=ncol*3?3:moves<=ncol*5?2:1;
-  St[level]=Math.max(St[level]||0,stars);try{localStorage.setItem("bs_st",JSON.stringify(St))}catch(e){}
+  const gain=stars*10+5;coins+=gain;saveCoins();St[level]=Math.max(St[level]||0,stars);try{localStorage.setItem("bs_st",JSON.stringify(St))}catch(e){}
   $("ws").textContent="★".repeat(stars)+"☆".repeat(3-stars);
   $("wt").textContent="Level "+level+" cleared";
-  $("wm").textContent=moves+" moves";
+  $("wm").textContent=moves+" moves · +"+gain+" coins";
   level++;maxL=Math.max(maxL,level);try{localStorage.setItem("bs_level",level);localStorage.setItem("bs_max",maxL)}catch(e){}
   [523,659,784,1047].forEach((f,k)=>tone(f,.3,"triangle",.14,k*.12));
   confetti();setTimeout(()=>$("win").classList.add("on"),500);
@@ -272,9 +284,10 @@ $("skip").onclick=()=>load(true);
 $("next").onclick=()=>{load(true);toast()};
 $("hint").onclick=()=>{
   if(done||busy)return;
+  if(coins<10){$("msg").textContent="Hints cost 10 coins. Win levels to earn more.";return}
   const p=solve(tubes);
   if(!p||!p.length){$("msg").textContent="No hint found. Try Undo.";return}
-  [p[0][0],p[0][1]].forEach(i=>{const e=board.children[i];e.classList.add("hint");setTimeout(()=>e.classList.remove("hint"),1900)});
+  coins-=10;saveCoins();render();[p[0][0],p[0][1]].forEach(i=>{const e=board.children[i];e.classList.add("hint");setTimeout(()=>e.classList.remove("hint"),1900)});
   $("msg").textContent="Move from the first glowing tube to the second.";
 };
 $("snd").onclick=()=>{muted=!muted;$("snd").textContent=muted?"🔇":"🔊";try{localStorage.setItem("bs_mute",muted?"1":"0")}catch(e){}};
@@ -299,11 +312,11 @@ $("playBtn").onclick=()=>seen?play():show("howto");
 $("menu").onclick=()=>show("home");
 function drawLevels(){const g=$("lg");g.innerHTML="";for(let n=1;n<=30;n++){const b=document.createElement("button");b.innerHTML=n<=maxL?n+'<br><small style="color:#ffe14d">'+"★".repeat(St[n]||0)+"</small>":"🔒";b.disabled=n>maxL;
  b.onclick=()=>{level=n;try{localStorage.setItem("bs_level",n)}catch(e){}load(true);play()};g.appendChild(b)}}
-function sync(){$("s_snd").textContent="Sound: "+(muted?"off":"on");$("s_cb").textContent="Shapes: "+(document.body.classList.contains("sym")?"on":"off");$("s_skin").textContent="Ball style: "+SK[sk];$("reset").textContent="Reset progress";rc=0}
+function sync(){$("s_snd").textContent="Sound: "+(muted?"off":"on");$("s_cb").textContent="Shapes: "+(document.body.classList.contains("sym")?"on":"off");$("s_skin").textContent="Ball style: "+SK[sk];$("s_theme").textContent="Theme: "+TH[th];$("reset").textContent="Reset progress";rc=0}
 $("s_snd").onclick=()=>{$("snd").click();sync()};
 $("s_cb").onclick=()=>{$("cb").click();sync()};
 $("reset").onclick=()=>{if(!rc){rc=1;$("reset").textContent="Tap again to confirm";return}
- level=1;maxL=1;seen=false;try{localStorage.removeItem("bs_level");localStorage.removeItem("bs_max");localStorage.removeItem("bs_seen");localStorage.removeItem("bs_st");St={}}catch(e){}
+ level=1;maxL=1;seen=false;try{localStorage.removeItem("bs_level");localStorage.removeItem("bs_max");localStorage.removeItem("bs_seen");localStorage.removeItem("bs_st");St={};coins=30;saveCoins()}catch(e){}
  load(true);show("home")};
 load(true);
 let St={};try{St=JSON.parse(localStorage.getItem("bs_st"))||{}}catch(e){}
@@ -311,12 +324,16 @@ const SK=["glossy","candy","gem","flat"];let sk=0;
 try{sk=Math.max(0,SK.indexOf(localStorage.getItem("bs_skin")))}catch(e){}
 function applySk(){SK.forEach(s=>document.body.classList.toggle("sk-"+s,s===SK[sk]))}
 $("s_skin").onclick=()=>{sk=(sk+1)%SK.length;try{localStorage.setItem("bs_skin",SK[sk])}catch(e){}applySk();sync()};
-function spawnBg(){const b=$("bg");for(let i=0;i<16;i++){const e=document.createElement("i"),s=20+Math.random()*70;e.className="bub";
+function spawnBg(){const b=$("bg");for(let i=0;i<10;i++){const e=document.createElement("i"),s=20+Math.random()*70;e.className="bub";
  e.style.cssText="left:"+Math.random()*100+"%;width:"+s+"px;height:"+s+"px;animation-duration:"+(10+Math.random()*14)+"s;animation-delay:-"+Math.random()*20+"s";b.appendChild(e)}}
 function popText(t,r,col){const e=document.createElement("div");e.textContent=t;
  e.style.cssText="position:fixed;z-index:66;pointer-events:none;font-weight:800;font-size:22px;color:#fff;text-shadow:0 2px 0 "+col+",0 0 12px "+col+";left:"+(r.left+r.width/2)+"px;top:"+r.top+"px";
  document.body.appendChild(e);e.animate([{opacity:1,transform:"translate(-50%,0)"},{opacity:0,transform:"translate(-50%,-60px)"}],{duration:900}).onfinish=()=>e.remove()}
-applySk();spawnBg();
+const TH=["aurora","sunset","ocean","midnight"];let th=0;
+try{th=Math.max(0,TH.indexOf(localStorage.getItem("bs_th")))}catch(e){}
+function applyTh(){TH.forEach(t=>document.body.classList.toggle("th-"+t,t===TH[th]))}
+$("s_theme").onclick=()=>{th=(th+1)%TH.length;try{localStorage.setItem("bs_th",TH[th])}catch(e){}applyTh();sync()};
+applySk();applyTh();spawnBg();
 setTimeout(()=>show("home"),1700);
 if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script>
